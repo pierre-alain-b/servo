@@ -218,10 +218,11 @@ class CommandBase(object):
         return self._use_stable_rust
 
     def rust_path(self):
+        version = self.rust_version()
         if self._use_stable_rust:
-            return "rustc-%s-%s" % (self.rust_version(), host_triple())
+            return "%s/rustc-%s-%s" % (version, version, host_triple())
         else:
-            return "%s/rustc-nightly-%s" % (self.rust_version(), host_triple())
+            return "%s/rustc-nightly-%s" % (version, host_triple())
 
     def rust_version(self):
         if self._rust_version is None or self._use_stable_rust != self._rust_version_is_stable:
@@ -332,10 +333,7 @@ class CommandBase(object):
 
         env["CARGO_HOME"] = self.config["tools"]["cargo-home-dir"]
 
-        if self.use_stable_rust():
-            env["CARGO_TARGET_DIR"] = path.join(self.context.topdir, "ports/stable-rust/target")
-        elif "CARGO_TARGET_DIR" not in env:
-            env["CARGO_TARGET_DIR"] = path.join(self.context.topdir, "target")
+        env["CARGO_TARGET_DIR"] = path.join(self.context.topdir, "target")
 
         if extra_lib:
             if sys.platform == "darwin":
